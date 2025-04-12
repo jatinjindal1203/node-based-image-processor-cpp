@@ -1,32 +1,29 @@
-# Prerequisites
-*.d
+# ==== CMake build files ====
+build/                              # Ignore the build directory
+CMakeCache.txt                      # CMake cache file
+CMakeFiles/                         # CMake build system folder
+cmake_install.cmake                 # CMake install script
+install_manifest.txt                # CMake generated manifest
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# ==== Visual Studio / VS Code ====
+.vscode/                           # VS Code settings, if you don't want to share them
+*.vcxproj.user                     # Visual Studio user-specific files
+*.suo                              # Visual Studio solution user options
+*.opensdf                          # Visual Studio debug symbols
+*.sdf                              # Visual Studio database file
+*.cache                            # Cache files
 
-# Precompiled Headers
-*.gch
-*.pch
+# ==== Compiler Output ====
+*.obj                              # Object files
+*.o                                # Object files
+*.exe                              # Executable files
+*.dll                              # Dynamic link libraries
+*.pdb                              # Debug symbol files
+*.ilk                              # Incremental linker files
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# ==== Qt and moc generated files ====
+mocs_compilation_*.*                # Moc compilation files (should be in build directory)
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# ==== Other Temporary Files ====
+*~                                  # Backup files
+*.log                              # Log files
