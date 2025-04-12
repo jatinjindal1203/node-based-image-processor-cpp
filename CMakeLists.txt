@@ -20,7 +20,15 @@ add_executable(NodeBasedImageProcessorCpp
     src/ImageInputNode.cpp 
     src/OutputNode.cpp
     src/NodeGraph.cpp
-    include/MainWindow.h   # <-- Add this line
+    src/BrightnessContrastNode.cpp 
+    src/ColorChannelSplitter.cpp 
+    src/BlurNode.cpp 
+    src/ThresholdNode.cpp
+    src/EdgeDetectionNode.cpp
+    src/BlendNode.cpp
+    src/NoiseGenerationNode.cpp
+    src/ConvolutionFilterNode.cpp
+    include/MainWindow.h   # This ensures AUTOMOC runs on MainWindow.h
 )
 
 target_link_libraries(NodeBasedImageProcessorCpp
