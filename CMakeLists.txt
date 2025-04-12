@@ -19,6 +19,7 @@ add_executable(NodeBasedImageProcessorCpp
     src/MainWindow.cpp 
     src/ImageInputNode.cpp 
     src/OutputNode.cpp
+    src/NodeGraph.cpp
     include/MainWindow.h   # <-- Add this line
 )
 
