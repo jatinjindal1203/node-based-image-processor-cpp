@@ -1,27 +1,21 @@
 #include "ConvolutionFilterNode.h"
 #include <opencv2/imgproc.hpp>
-#include <stdexcept>
-#include <string>
 
-ConvolutionFilterNode::ConvolutionFilterNode() : Node("Convolution Filter Node")
+ConvolutionFilterNode::ConvolutionFilterNode(int order)
+    : Node("ConvolutionFilterNode", order)
 {
-    // Default kernel: identity filter (no change)
-    kernel = cv::Mat::eye(3, 3, CV_32F);
+    // Default identity kernel 3x3.
+    m_kernel = cv::Mat::eye(3, 3, CV_32F);
 }
 
 ConvolutionFilterNode::~ConvolutionFilterNode() {}
 
-void ConvolutionFilterNode::setKernel(const cv::Mat &k)
+void ConvolutionFilterNode::setKernel(const cv::Mat &kernel)
 {
-    // Verify kernel size is 3x3 or 5x5
-    if ((k.rows == 3 && k.cols == 3) || (k.rows == 5 && k.cols == 5))
-    {
-        kernel = k.clone();
-    }
+    if ((kernel.rows == 3 && kernel.cols == 3) || (kernel.rows == 5 && kernel.cols == 5))
+        m_kernel = kernel.clone();
     else
-    {
         throw std::invalid_argument("Kernel must be 3x3 or 5x5.");
-    }
 }
 
 void ConvolutionFilterNode::setPreset(const std::string &preset)
@@ -33,34 +27,36 @@ void ConvolutionFilterNode::loadPreset(const std::string &preset)
 {
     if (preset == "sharpen")
     {
-        float data[9] = {0, -1, 0, -1, 5, -1, 0, -1, 0};
-        kernel = cv::Mat(3, 3, CV_32F, data).clone();
+        float data[9] = {0, -1, 0,
+                         -1, 5, -1,
+                         0, -1, 0};
+        m_kernel = cv::Mat(3, 3, CV_32F, data).clone();
     }
     else if (preset == "emboss")
     {
-        float data[9] = {-2, -1, 0, -1, 1, 1, 0, 1, 2};
-        kernel = cv::Mat(3, 3, CV_32F, data).clone();
+        float data[9] = {-2, -1, 0,
+                         -1, 1, 1,
+                         0, 1, 2};
+        m_kernel = cv::Mat(3, 3, CV_32F, data).clone();
     }
     else if (preset == "edge_enhance")
     {
-        float data[9] = {0, 0, 0, -1, 1, -1, 0, 0, 0};
-        kernel = cv::Mat(3, 3, CV_32F, data).clone();
+        float data[9] = {0, 0, 0,
+                         -1, 1, -1,
+                         0, 0, 0};
+        m_kernel = cv::Mat(3, 3, CV_32F, data).clone();
     }
     else
     {
-        // Default identity filter if no valid preset
-        kernel = cv::Mat::eye(3, 3, CV_32F);
+        m_kernel = cv::Mat::eye(3, 3, CV_32F);
     }
 }
 
-void ConvolutionFilterNode::process()
+cv::Mat ConvolutionFilterNode::process(const cv::Mat &input)
 {
-    if (inputImage.empty())
-        return;
-    cv::filter2D(inputImage, outputImage, -1, kernel);
-}
-
-const cv::Mat &ConvolutionFilterNode::getResult() const
-{
-    return outputImage;
+    if (input.empty())
+        return input;
+    cv::Mat output;
+    cv::filter2D(input, output, -1, m_kernel);
+    return output;
 }

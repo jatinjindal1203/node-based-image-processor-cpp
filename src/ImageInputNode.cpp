@@ -1,23 +1,21 @@
 #include "ImageInputNode.h"
-#include <opencv2/imgcodecs.hpp>
 
-ImageInputNode::ImageInputNode() : Node("Image Input Node") {}
+ImageInputNode::ImageInputNode() : Node("ImageInputNode", 0) {}
+
 ImageInputNode::~ImageInputNode() {}
 
-void ImageInputNode::loadImage(const QString &filePath)
+void ImageInputNode::setImage(const cv::Mat &img)
 {
-    image = cv::imread(filePath.toStdString(), cv::IMREAD_COLOR);
+    m_image = img;
 }
 
-const cv::Mat &ImageInputNode::getImage() const
+cv::Mat ImageInputNode::getImage() const
 {
-    return image;
+    return m_image;
 }
 
-void ImageInputNode::process()
+cv::Mat ImageInputNode::process(const cv::Mat &input)
 {
-    if (image.empty())
-    {
-        // Add error handling if needed.
-    }
+    Q_UNUSED(input);
+    return m_image;
 }

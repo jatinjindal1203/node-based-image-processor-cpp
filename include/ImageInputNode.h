@@ -2,20 +2,22 @@
 #define IMAGEINPUTNODE_H
 
 #include "Node.h"
-#include <opencv2/opencv.hpp>
 
+// The input node simply stores an image (loaded externally) and returns it.
 class ImageInputNode : public Node
 {
 public:
     ImageInputNode();
-    ~ImageInputNode();
+    ~ImageInputNode() override;
 
-    void loadImage(const QString &filePath);
-    const cv::Mat &getImage() const;
-    void process() override;
+    void setImage(const cv::Mat &img);
+    cv::Mat getImage() const;
+
+    // process() here ignores its argument and returns the stored image.
+    cv::Mat process(const cv::Mat &input) override;
 
 private:
-    cv::Mat image;
+    cv::Mat m_image;
 };
 
 #endif // IMAGEINPUTNODE_H

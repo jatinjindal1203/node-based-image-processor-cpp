@@ -3,31 +3,24 @@
 
 #include "Node.h"
 #include <opencv2/opencv.hpp>
-#include <vector>
+#include <stdexcept>
+#include <string>
 
 class ConvolutionFilterNode : public Node
 {
 public:
-    ConvolutionFilterNode();
-    virtual ~ConvolutionFilterNode();
+    ConvolutionFilterNode(int order = 7);
+    ~ConvolutionFilterNode() override;
 
-    // Set custom kernel. The kernel should be 3x3 or 5x5.
+    // Set a custom kernel (3x3 or 5x5).
     void setKernel(const cv::Mat &kernel);
-
-    // Alternatively, set a preset filter by name (sharpen, emboss, edge enhance, etc.)
+    // Or set a preset by name.
     void setPreset(const std::string &preset);
 
-    // Process: Apply the convolution filter to the image.
-    void process() override;
-
-    const cv::Mat &getResult() const;
+    cv::Mat process(const cv::Mat &input) override;
 
 private:
-    cv::Mat inputImage;
-    cv::Mat outputImage;
-    cv::Mat kernel;
-
-    // Helper: load a preset kernel.
+    cv::Mat m_kernel;
     void loadPreset(const std::string &preset);
 };
 

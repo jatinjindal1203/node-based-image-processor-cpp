@@ -1,53 +1,26 @@
 #include "EdgeDetectionNode.h"
+#include <opencv2/imgproc.hpp>
 
-EdgeDetectionNode::EdgeDetectionNode()
-    : Node("Edge Detection Node"), method(EdgeMethod::Canny),
-      threshold1(50), threshold2(150), kernelSize(3) {}
+EdgeDetectionNode::EdgeDetectionNode(int order)
+    : Node("EdgeDetectionNode", order), m_lowThreshold(50), m_highThreshold(150) {}
+
 EdgeDetectionNode::~EdgeDetectionNode() {}
 
-void EdgeDetectionNode::setMethod(EdgeMethod m)
+void EdgeDetectionNode::setThresholds(double low, double high)
 {
-    method = m;
+    m_lowThreshold = low;
+    m_highThreshold = high;
 }
 
-void EdgeDetectionNode::setThresholds(double t1, double t2)
+cv::Mat EdgeDetectionNode::process(const cv::Mat &input)
 {
-    threshold1 = t1;
-    threshold2 = t2;
-}
-
-void EdgeDetectionNode::setKernelSize(int size)
-{
-    kernelSize = (size % 2 == 0) ? size + 1 : size;
-}
-
-void EdgeDetectionNode::process()
-{
-    if (inputImage.empty())
-        return;
-
-    cv::Mat gray;
-    if (inputImage.channels() == 3)
-        cv::cvtColor(inputImage, gray, cv::COLOR_BGR2GRAY);
+    if (input.empty())
+        return input;
+    cv::Mat gray, edges;
+    if (input.channels() == 3)
+        cv::cvtColor(input, gray, cv::COLOR_BGR2GRAY);
     else
-        gray = inputImage;
-
-    if (method == EdgeMethod::Canny)
-    {
-        cv::Canny(gray, outputImage, threshold1, threshold2);
-    }
-    else if (method == EdgeMethod::Sobel)
-    {
-        cv::Mat grad_x, grad_y, abs_grad_x, abs_grad_y;
-        cv::Sobel(gray, grad_x, CV_16S, 1, 0, kernelSize);
-        cv::Sobel(gray, grad_y, CV_16S, 0, 1, kernelSize);
-        cv::convertScaleAbs(grad_x, abs_grad_x);
-        cv::convertScaleAbs(grad_y, abs_grad_y);
-        cv::addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, outputImage);
-    }
-}
-
-const cv::Mat &EdgeDetectionNode::getResult() const
-{
-    return outputImage;
+        gray = input;
+    cv::Canny(gray, edges, m_lowThreshold, m_highThreshold);
+    return edges;
 }

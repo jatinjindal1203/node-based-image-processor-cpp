@@ -1,50 +1,35 @@
 #include "BlendNode.h"
+#include <opencv2/imgproc.hpp>
 #include <algorithm>
 
-BlendNode::BlendNode()
-    : Node("Blend Node"), blendMode(BlendMode::Normal), opacity(0.5) {}
+BlendNode::BlendNode(int order)
+    : Node("BlendNode", order), m_opacity(0.5) {}
+
 BlendNode::~BlendNode() {}
 
-void BlendNode::setInputImages(const cv::Mat &img1, const cv::Mat &img2)
+void BlendNode::setSecondImage(const cv::Mat &img)
 {
-    image1 = img1;
-    image2 = img2;
+    m_secondImage = img;
 }
 
-void BlendNode::setBlendMode(BlendMode mode)
+void BlendNode::setOpacity(double opacity)
 {
-    blendMode = mode;
+    m_opacity = std::max(0.0, std::min(1.0, opacity));
 }
 
-void BlendNode::setOpacity(double op)
+cv::Mat BlendNode::process(const cv::Mat &input)
 {
-    opacity = std::max(0.0, std::min(1.0, op));
-}
-
-void BlendNode::process()
-{
-    if (image1.empty() || image2.empty())
-        return;
-    // Ensure both images are the same size and type, otherwise resize:
-    if (image1.size() != image2.size() || image1.type() != image2.type())
-    {
-        cv::resize(image2, image2, image1.size());
-    }
-
-    // For demonstration, implement normal blend using weighted addition.
-    // In a real scenario, you'd implement different blend modes.
-    if (blendMode == BlendMode::Normal)
-    {
-        cv::addWeighted(image1, opacity, image2, 1 - opacity, 0, blendedImage);
-    }
+    if (input.empty())
+        return input;
+    cv::Mat img2;
+    // If no valid second image, use input.
+    if (m_secondImage.empty() ||
+        m_secondImage.size() != input.size() || m_secondImage.type() != input.type())
+        img2 = input.clone();
     else
-    {
-        // For other modes, simply falling back to normal blend for now.
-        cv::addWeighted(image1, opacity, image2, 1 - opacity, 0, blendedImage);
-    }
-}
+        img2 = m_secondImage;
 
-const cv::Mat &BlendNode::getResult() const
-{
-    return blendedImage;
+    cv::Mat output;
+    cv::addWeighted(input, 1.0 - m_opacity, img2, m_opacity, 0, output);
+    return output;
 }

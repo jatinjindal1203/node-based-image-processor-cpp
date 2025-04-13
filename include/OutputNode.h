@@ -2,20 +2,21 @@
 #define OUTPUTNODE_H
 
 #include "Node.h"
-#include <opencv2/opencv.hpp>
 
+// The output node stores the final processed image.
 class OutputNode : public Node
 {
 public:
     OutputNode();
-    ~OutputNode();
+    ~OutputNode() override;
 
-    void setInput(const cv::Mat &inputImage);
-    void saveImage(const QString &filePath);
-    void process() override;
+    // Process simply stores the image and returns it.
+    cv::Mat process(const cv::Mat &input) override;
+
+    cv::Mat output() const;
 
 private:
-    cv::Mat processedImage;
+    cv::Mat m_output;
 };
 
 #endif // OUTPUTNODE_H

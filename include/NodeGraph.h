@@ -1,26 +1,36 @@
 #ifndef NODEGRAPH_H
 #define NODEGRAPH_H
 
+#include "Node.h"
 #include <vector>
 #include <memory>
-#include "Node.h"
+#include <algorithm>
 
-// A simple manager for nodes that makes up the processing graph
 class NodeGraph
 {
 public:
-    NodeGraph();
-    ~NodeGraph();
+    NodeGraph() {}
+    ~NodeGraph() {}
 
-    // Adds a new node to the graph
-    void addNode(std::shared_ptr<Node> node);
+    // Add a processing node
+    void addNode(std::shared_ptr<Node> node)
+    {
+        nodes.push_back(node);
+    }
 
-    // Processes all nodes in the graph sequentially.
-    // Later, you can extend this to implement specific ordering or dependency checks.
-    void processAll();
+    // Execute the pipeline: sort nodes by order, then pass the image through each.
+    cv::Mat processAll(const cv::Mat &input)
+    {
+        std::vector<std::shared_ptr<Node>> sortedNodes = nodes;
+        std::sort(sortedNodes.begin(), sortedNodes.end(), [](const std::shared_ptr<Node> &a, const std::shared_ptr<Node> &b)
+                  { return a->order() < b->order(); });
+        cv::Mat current = input;
+        for (auto &node : sortedNodes)
+            current = node->process(current);
+        return current;
+    }
 
 private:
-    // A list to hold all nodes managed by this graph.
     std::vector<std::shared_ptr<Node>> nodes;
 };
 

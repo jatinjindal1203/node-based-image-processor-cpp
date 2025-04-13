@@ -2,35 +2,18 @@
 #define THRESHOLDNODE_H
 
 #include "Node.h"
-#include <opencv2/opencv.hpp>
-
-enum class ThresholdMethod
-{
-    Binary,
-    Adaptive,
-    Otsu
-};
 
 class ThresholdNode : public Node
 {
 public:
-    ThresholdNode();
-    virtual ~ThresholdNode();
+    ThresholdNode(int order = 3);
+    ~ThresholdNode() override;
 
-    // Set parameters for thresholding.
-    void setThresholdValue(double value);
-    void setMethod(ThresholdMethod method);
-
-    // Process: Apply thresholding to the image.
-    void process() override;
-
-    const cv::Mat &getResult() const;
+    void setThreshold(double threshold); // 0.0 to 255.0
+    cv::Mat process(const cv::Mat &input) override;
 
 private:
-    cv::Mat inputImage;
-    cv::Mat outputImage;
-    double thresholdValue;
-    ThresholdMethod method;
+    double m_threshold;
 };
 
 #endif // THRESHOLDNODE_H

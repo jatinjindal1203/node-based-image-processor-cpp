@@ -4,37 +4,19 @@
 #include "Node.h"
 #include <opencv2/opencv.hpp>
 
-enum class BlendMode
-{
-    Normal,
-    Multiply,
-    Screen,
-    Overlay,
-    Difference
-};
-
 class BlendNode : public Node
 {
 public:
-    BlendNode();
-    virtual ~BlendNode();
+    BlendNode(int order = 5);
+    ~BlendNode() override;
 
-    // Set second image for blending. For simplicity, we assume two images are provided.
-    void setInputImages(const cv::Mat &img1, const cv::Mat &img2);
-    // Set blend mode and opacity (0.0 to 1.0)
-    void setBlendMode(BlendMode mode);
-    void setOpacity(double opacity);
-
-    // Process: Blend the two images using the selected mode.
-    void process() override;
-
-    const cv::Mat &getResult() const;
+    void setSecondImage(const cv::Mat &img);
+    void setOpacity(double opacity); // 0.0 to 1.0
+    cv::Mat process(const cv::Mat &input) override;
 
 private:
-    cv::Mat image1, image2;
-    cv::Mat blendedImage;
-    BlendMode blendMode;
-    double opacity; // opacity/mix factor for image blending
+    cv::Mat m_secondImage;
+    double m_opacity;
 };
 
 #endif // BLENDNODE_H

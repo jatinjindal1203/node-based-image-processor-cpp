@@ -2,41 +2,29 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <cstdlib>
+#include <ctime>
 
-NoiseGenerationNode::NoiseGenerationNode()
-    : Node("Noise Generation Node"), noiseType(NoiseType::Perlin), scale(1.0), octaves(1), persistence(0.5) {}
+NoiseGenerationNode::NoiseGenerationNode(int order)
+    : Node("NoiseGenerationNode", order),
+      m_width(640), m_height(480), m_seed(static_cast<unsigned int>(time(nullptr))) {}
+
 NoiseGenerationNode::~NoiseGenerationNode() {}
 
-void NoiseGenerationNode::setNoiseType(NoiseType type)
+void NoiseGenerationNode::setSize(int width, int height)
 {
-    noiseType = type;
+    m_width = width;
+    m_height = height;
 }
 
-void NoiseGenerationNode::setScale(double s)
+void NoiseGenerationNode::setSeed(unsigned int seed)
 {
-    scale = s;
+    m_seed = seed;
 }
 
-void NoiseGenerationNode::setOctaves(int o)
+cv::Mat NoiseGenerationNode::process(const cv::Mat &input)
 {
-    octaves = o;
-}
-
-void NoiseGenerationNode::setPersistence(double p)
-{
-    persistence = p;
-}
-
-void NoiseGenerationNode::process()
-{
-    // For simplicity, create a noise image using random numbers.
-    // In a real implementation, you would implement Perlin, Simplex, or Worley noise.
-    int width = 640, height = 480;
-    noiseImage.create(height, width, CV_8UC1);
-    cv::randu(noiseImage, 0, 255);
-}
-
-const cv::Mat &NoiseGenerationNode::getResult() const
-{
-    return noiseImage;
+    Q_UNUSED(input);
+    cv::Mat noise(m_height, m_width, CV_8UC1);
+    cv::randu(noise, 0, 255);
+    return noise;
 }

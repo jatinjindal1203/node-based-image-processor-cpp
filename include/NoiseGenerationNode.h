@@ -2,38 +2,24 @@
 #define NOISEGENERATIONNODE_H
 
 #include "Node.h"
-#include <opencv2/opencv.hpp>
-
-enum class NoiseType
-{
-    Perlin,
-    Simplex,
-    Worley
-};
 
 class NoiseGenerationNode : public Node
 {
 public:
-    NoiseGenerationNode();
-    virtual ~NoiseGenerationNode();
+    NoiseGenerationNode(int order = 6);
+    ~NoiseGenerationNode() override;
 
-    // Set noise parameters
-    void setNoiseType(NoiseType type);
-    void setScale(double scale);
-    void setOctaves(int octaves);
-    void setPersistence(double persistence);
+    // Set the desired size for the noise image.
+    void setSize(int width, int height);
+    // Optionally set a random seed.
+    void setSeed(unsigned int seed);
 
-    // Process: generate noise. For demonstration, we'll generate random noise.
-    void process() override;
-
-    const cv::Mat &getResult() const;
+    cv::Mat process(const cv::Mat &input) override;
 
 private:
-    cv::Mat noiseImage;
-    NoiseType noiseType;
-    double scale;       // affects frequency of noise
-    int octaves;        // number of noise layers
-    double persistence; // roughness or amplitude
+    int m_width;
+    int m_height;
+    unsigned int m_seed;
 };
 
 #endif // NOISEGENERATIONNODE_H

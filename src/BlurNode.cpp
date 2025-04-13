@@ -1,30 +1,23 @@
 #include "BlurNode.h"
+#include <opencv2/imgproc.hpp>
 #include <algorithm>
 
-BlurNode::BlurNode() : Node("Blur Node"), kernelSize(3) {} // default kernel size is 3 (must be odd)
+BlurNode::BlurNode(int order) : Node("BlurNode", order), m_kernelSize(3) {}
+
 BlurNode::~BlurNode() {}
 
 void BlurNode::setKernelSize(int size)
 {
-    // Enforce odd value between 1 and 21
-    if (size < 1)
-        size = 1;
-    if (size > 21)
-        size = 21;
     if (size % 2 == 0)
-        size += 1;
-    kernelSize = size;
+        size++; // force odd
+    m_kernelSize = std::max(1, std::min(size, 21));
 }
 
-void BlurNode::process()
+cv::Mat BlurNode::process(const cv::Mat &input)
 {
-    if (inputImage.empty())
-        return;
-    // Apply Gaussian blur with kernel size (radius 1-21 pixels)
-    cv::GaussianBlur(inputImage, outputImage, cv::Size(kernelSize, kernelSize), 0);
-}
-
-const cv::Mat &BlurNode::getResult() const
-{
-    return outputImage;
+    if (input.empty())
+        return input;
+    cv::Mat output;
+    cv::GaussianBlur(input, output, cv::Size(m_kernelSize, m_kernelSize), 0);
+    return output;
 }

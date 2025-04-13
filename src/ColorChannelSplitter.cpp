@@ -1,39 +1,26 @@
 #include "ColorChannelSplitter.h"
+#include <opencv2/imgproc.hpp>
+#include <vector>
 
-ColorChannelSplitter::ColorChannelSplitter()
-    : Node("Color Channel Splitter"), outputGrayscale(false)
-{
-}
+ColorChannelSplitter::ColorChannelSplitter(int order)
+    : Node("ColorChannelSplitter", order), m_grayscaleOutput(true) {}
 
 ColorChannelSplitter::~ColorChannelSplitter() {}
 
-void ColorChannelSplitter::setOutputGrayscale(bool grayscale)
+void ColorChannelSplitter::setGrayscaleOutput(bool grayscale)
 {
-    outputGrayscale = grayscale;
+    m_grayscaleOutput = grayscale;
 }
 
-void ColorChannelSplitter::process()
+cv::Mat ColorChannelSplitter::process(const cv::Mat &input)
 {
-    channels.clear();
-    if (inputImage.empty())
-    {
-        return;
-    }
-
-    // Split image into channels
-    cv::split(inputImage, channels);
-
-    if (outputGrayscale)
-    {
-        // For each channel, convert it to grayscale image (this is often already single channel)
-        for (auto &ch : channels)
-        {
-            // Optionally, normalize or adjust display here.
-        }
-    }
-}
-
-const std::vector<cv::Mat> &ColorChannelSplitter::getChannels() const
-{
-    return channels;
+    if (input.empty())
+        return input;
+    std::vector<cv::Mat> channels;
+    cv::split(input, channels);
+    // Convert each channel to grayscale if needed (each channel is single channel already).
+    // For visualization, we horizontally concatenate channels.
+    cv::Mat output;
+    cv::hconcat(channels, output);
+    return output;
 }

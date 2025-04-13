@@ -1,42 +1,26 @@
 #include "BrightnessContrastNode.h"
+#include <algorithm>
 
-BrightnessContrastNode::BrightnessContrastNode()
-    : Node("Brightness/Contrast Node"), brightness(0), contrast(1.0)
-{
-}
+BrightnessContrastNode::BrightnessContrastNode(int order)
+    : Node("BrightnessContrastNode", order), m_brightness(0), m_contrast(1.0) {}
 
 BrightnessContrastNode::~BrightnessContrastNode() {}
 
-void BrightnessContrastNode::setBrightness(int b)
+void BrightnessContrastNode::setBrightness(int brightness)
 {
-    brightness = std::max(-100, std::min(100, b));
+    m_brightness = std::max(-100, std::min(100, brightness));
 }
 
-void BrightnessContrastNode::setContrast(double c)
+void BrightnessContrastNode::setContrast(double contrast)
 {
-    contrast = std::max(0.0, std::min(3.0, c));
+    m_contrast = std::max(0.0, std::min(3.0, contrast));
 }
 
-void BrightnessContrastNode::resetParameters()
+cv::Mat BrightnessContrastNode::process(const cv::Mat &input)
 {
-    brightness = 0;
-    contrast = 1.0;
-}
-
-void BrightnessContrastNode::process()
-{
-    // For demonstration, assume inputImage has been set externally.
-    if (inputImage.empty())
-    {
-        // Nothing to process
-        return;
-    }
-    // Use convertScaleAbs to adjust brightness and contrast:
-    // new_image = input * contrast + brightness
-    inputImage.convertTo(outputImage, -1, contrast, brightness);
-}
-
-const cv::Mat &BrightnessContrastNode::getResult() const
-{
-    return outputImage;
+    if (input.empty())
+        return input;
+    cv::Mat output;
+    input.convertTo(output, -1, m_contrast, m_brightness);
+    return output;
 }

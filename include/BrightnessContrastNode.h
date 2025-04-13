@@ -2,33 +2,22 @@
 #define BRIGHTNESSCONTRASTNODE_H
 
 #include "Node.h"
-#include <opencv2/opencv.hpp>
 
 class BrightnessContrastNode : public Node
 {
 public:
-    BrightnessContrastNode();
-    virtual ~BrightnessContrastNode();
+    // Default order for a processing node is 1; you can change it later.
+    BrightnessContrastNode(int order = 1);
+    ~BrightnessContrastNode() override;
 
-    // Set parameters in the range specified:
-    // brightness: -100 to +100, contrast: 0.0 to 3.0
-    void setBrightness(int brightness);
-    void setContrast(double contrast);
+    void setBrightness(int brightness); // -100 to +100
+    void setContrast(double contrast);  // 0.0 to 3.0
 
-    // Reset to default parameters
-    void resetParameters();
-
-    // Process: Adjust brightness and contrast using OpenCV conversion.
-    void process() override;
-
-    // Get the processed image result.
-    const cv::Mat &getResult() const;
+    cv::Mat process(const cv::Mat &input) override;
 
 private:
-    cv::Mat inputImage;
-    cv::Mat outputImage;
-    int brightness;  // default 0
-    double contrast; // default 1.0
+    int m_brightness;
+    double m_contrast;
 };
 
 #endif // BRIGHTNESSCONTRASTNODE_H

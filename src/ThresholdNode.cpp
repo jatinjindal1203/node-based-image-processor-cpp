@@ -1,50 +1,26 @@
 #include "ThresholdNode.h"
+#include <opencv2/imgproc.hpp>
+#include <algorithm>
 
-ThresholdNode::ThresholdNode()
-    : Node("Threshold Node"), thresholdValue(128.0), method(ThresholdMethod::Binary) {}
+ThresholdNode::ThresholdNode(int order)
+    : Node("ThresholdNode", order), m_threshold(128.0) {}
+
 ThresholdNode::~ThresholdNode() {}
 
-void ThresholdNode::setThresholdValue(double value)
+void ThresholdNode::setThreshold(double threshold)
 {
-    thresholdValue = value;
+    m_threshold = std::max(0.0, std::min(255.0, threshold));
 }
 
-void ThresholdNode::setMethod(ThresholdMethod m)
+cv::Mat ThresholdNode::process(const cv::Mat &input)
 {
-    method = m;
-}
-
-void ThresholdNode::process()
-{
-    if (inputImage.empty())
-        return;
-
-    // Convert input to grayscale if it's not already (for thresholding)
-    cv::Mat gray;
-    if (inputImage.channels() == 3)
-        cv::cvtColor(inputImage, gray, cv::COLOR_BGR2GRAY);
+    if (input.empty())
+        return input;
+    cv::Mat gray, output;
+    if (input.channels() == 3)
+        cv::cvtColor(input, gray, cv::COLOR_BGR2GRAY);
     else
-        gray = inputImage;
-
-    // Apply thresholding based on method.
-    switch (method)
-    {
-    case ThresholdMethod::Binary:
-        cv::threshold(gray, outputImage, thresholdValue, 255, cv::THRESH_BINARY);
-        break;
-    case ThresholdMethod::Adaptive:
-        cv::adaptiveThreshold(gray, outputImage, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
-        break;
-    case ThresholdMethod::Otsu:
-        cv::threshold(gray, outputImage, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-        break;
-    default:
-        cv::threshold(gray, outputImage, thresholdValue, 255, cv::THRESH_BINARY);
-        break;
-    }
-}
-
-const cv::Mat &ThresholdNode::getResult() const
-{
-    return outputImage;
+        gray = input;
+    cv::threshold(gray, output, m_threshold, 255, cv::THRESH_BINARY);
+    return output;
 }

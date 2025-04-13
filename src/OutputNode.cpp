@@ -1,23 +1,16 @@
 #include "OutputNode.h"
-#include <opencv2/imgcodecs.hpp>
 
-OutputNode::OutputNode() : Node("Output Node") {}
+OutputNode::OutputNode() : Node("OutputNode", 100) {} // High order so it comes at the end.
+
 OutputNode::~OutputNode() {}
 
-void OutputNode::setInput(const cv::Mat &inputImage)
+cv::Mat OutputNode::process(const cv::Mat &input)
 {
-    processedImage = inputImage.clone();
+    m_output = input.clone();
+    return m_output;
 }
 
-void OutputNode::saveImage(const QString &filePath)
+cv::Mat OutputNode::output() const
 {
-    if (!processedImage.empty())
-    {
-        cv::imwrite(filePath.toStdString(), processedImage);
-    }
-}
-
-void OutputNode::process()
-{
-    // Currently, it's a simple pass-through.
+    return m_output;
 }
