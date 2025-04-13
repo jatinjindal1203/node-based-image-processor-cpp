@@ -6,6 +6,9 @@
 #include <QGraphicsScene>
 #include <QDockWidget>
 
+// Forward declaration for NodeItem
+class NodeItem;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -16,6 +19,16 @@ public:
 private slots:
     void openImage();
     void saveImage();
+
+    // New slots for adding nodes from the menu
+    void addInputNode();
+    void addBrightnessContrastNode();
+    void addBlurNode();
+    void addThresholdNode();
+    void addEdgeDetectionNode();
+    void addBlendNode();
+    void addNoiseGenerationNode();
+    void addConvolutionFilterNode();
 
 private:
     QGraphicsView *canvasView;

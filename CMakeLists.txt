@@ -16,10 +16,10 @@ include_directories(${OpenCV_INCLUDE_DIRS} include)
 
 add_executable(NodeBasedImageProcessorCpp
     src/main.cpp 
-    src/MainWindow.cpp 
+    src/MainWindow.cpp
+     
     src/ImageInputNode.cpp 
     src/OutputNode.cpp
-    src/NodeGraph.cpp
     src/BrightnessContrastNode.cpp 
     src/ColorChannelSplitter.cpp 
     src/BlurNode.cpp 
@@ -28,7 +28,11 @@ add_executable(NodeBasedImageProcessorCpp
     src/BlendNode.cpp
     src/NoiseGenerationNode.cpp
     src/ConvolutionFilterNode.cpp
+
+    src/NodeGraph.cpp
+    src/NodeItem.cpp
     include/MainWindow.h   # This ensures AUTOMOC runs on MainWindow.h
+    include/NodeItem.h
 )
 
 target_link_libraries(NodeBasedImageProcessorCpp
