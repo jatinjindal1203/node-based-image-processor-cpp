@@ -1,6 +1,5 @@
 #include "MainWindow.h"
 #include "NodeGraph.h"
-#include "NodeScene.h"
 #include "ImageInputNode.h"
 #include "OutputNode.h"
 #include "BrightnessContrastNode.h"
@@ -90,7 +89,6 @@ void MainWindow::setupUI()
 
     // Create a graphics view (can be used for visual node representation).
     canvasView = new QGraphicsView(this);
-    // For now, use a basic QGraphicsScene. (Later, you might use your NodeScene.)
     canvasView->setScene(new QGraphicsScene(this));
     layout->addWidget(canvasView);
 
