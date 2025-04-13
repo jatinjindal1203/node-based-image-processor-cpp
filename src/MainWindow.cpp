@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "NodeItem.h" // Our visual node representation
+#include "NodeScene.h"
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <QDockWidget>
@@ -24,7 +25,7 @@ void MainWindow::setupUI()
 
     // Create a QGraphicsView and QGraphicsScene as the canvas.
     canvasView = new QGraphicsView(this);
-    scene = new QGraphicsScene(this);
+    scene = new NodeScene(this);
     canvasView->setScene(scene);
     layout->addWidget(canvasView);
 

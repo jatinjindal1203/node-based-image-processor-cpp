@@ -6,14 +6,12 @@
 class Node
 {
 public:
-    Node(const QString &name) : name(name) {}
+    explicit Node(const QString &name) : m_name(name) {}
     virtual ~Node() {}
-
-    QString getName() const { return name; }
-    virtual void process() = 0;
-
-protected:
-    QString name;
+    QString name() const { return m_name; }
+    virtual void process() = 0; // Pure virtual: must be overridden in derived classes.
+private:
+    QString m_name;
 };
 
 #endif // NODE_H

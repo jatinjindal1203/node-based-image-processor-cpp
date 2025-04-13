@@ -9,35 +9,37 @@
 class NodeItem : public QGraphicsItem
 {
 public:
-    // Constructor takes a node name.
     explicit NodeItem(const QString &nodeName, QGraphicsItem *parent = nullptr);
 
-    // Set or get the node name.
     void setNodeName(const QString &name);
     QString nodeName() const;
 
-    // Overridden methods from QGraphicsItem.
+    // Overridden functions from QGraphicsItem:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
+    // New: Check if a given local position is within the connection port area.
+    bool isInConnectionPort(const QPointF &pos) const;
+
 protected:
-    // Override mouse events to support dragging and resizing.
+    // Mouse event overrides for moving and resizing:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
-    QString m_nodeName;                      // The displayed name of the node.
-    QRectF m_rect;                           // The rectangle representing the node's boundaries.
-    bool m_isResizing;                       // Indicates if the node is currently resizing.
-    QPointF m_resizeStartPos;                // Initial mouse position when resizing starts.
-    QRectF m_originalRect;                   // The node's rectangle at the start of resizing.
-    const qreal m_handleSize = 10.0;         // Base size of the resize handle.
-    const qreal m_handlePaddingFactor = 2.0; // Factor to enlarge the clickable region.
+    QString m_nodeName;
+    QRectF m_rect;
+    bool m_isResizing;
+    QPointF m_resizeStartPos;
+    QRectF m_originalRect;
+    const qreal m_handleSize = 10.0;
+    const qreal m_handlePaddingFactor = 2.0;
 
-    // Returns true if the given position (local coordinates) falls within the resize handle area.
-    bool isInResizeArea(const QPointF &pos) const;
+    // New: Define the connection port dimensions (located on the right edge)
+    const qreal m_portWidth = 15.0;
+    const qreal m_portHeight = 20.0;
 };
 
 #endif // NODEITEM_H

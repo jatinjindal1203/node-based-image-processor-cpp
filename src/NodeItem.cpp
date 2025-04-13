@@ -9,10 +9,10 @@
 NodeItem::NodeItem(const QString &nodeName, QGraphicsItem *parent)
     : QGraphicsItem(parent), m_nodeName(nodeName), m_isResizing(false)
 {
-    // Set the default rectangle size.
+    // Set a default size (you can adjust as needed)
     m_rect = QRectF(0, 0, 120, 60);
 
-    // Enable moving, selection, and hover events.
+    // Enable moving, selection, and hover events
     setFlags(ItemIsMovable | ItemIsSelectable);
     setAcceptHoverEvents(true);
 }
@@ -30,7 +30,7 @@ QString NodeItem::nodeName() const
 
 QRectF NodeItem::boundingRect() const
 {
-    // Provide a little extra space.
+    // Return the node's area with extra padding for pen width.
     return m_rect.adjusted(-2, -2, 2, 2);
 }
 
@@ -39,6 +39,7 @@ void NodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+    // Draw the node rectangle.
     QPen pen(Qt::black);
     if (isSelected())
     {
@@ -48,42 +49,54 @@ void NodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setBrush(Qt::lightGray);
     painter->drawRect(m_rect);
 
+    // Draw the node's name centered.
     QFont font = painter->font();
     font.setBold(true);
     painter->setFont(font);
     painter->drawText(m_rect, Qt::AlignCenter, m_nodeName);
 
-    // Draw the resize handle using an enlarged clickable area.
-    // We actually draw a handle of size m_handleSize.
+    // Draw the resize handle in the bottom-right corner.
     QRectF handleRect(m_rect.bottomRight() - QPointF(m_handleSize, m_handleSize), QSizeF(m_handleSize, m_handleSize));
     painter->setBrush(Qt::darkGray);
     painter->drawRect(handleRect);
+
+    // Optionally, draw the connection port region on the right side.
+    // (For visualization; you may remove this once the behavior is confirmed.)
+    qreal portX = m_rect.right() - m_portWidth;
+    qreal portY = m_rect.center().y() - m_portHeight / 2;
+    QRectF portRect(portX, portY, m_portWidth, m_portHeight);
+    QPen portPen(Qt::blue);
+    painter->setPen(portPen);
+    painter->setBrush(Qt::transparent);
+    painter->drawRect(portRect);
 }
 
-bool NodeItem::isInResizeArea(const QPointF &pos) const
+bool NodeItem::isInConnectionPort(const QPointF &pos) const
 {
-    // Define a larger clickable area for the resize handle.
-    qreal areaSize = m_handleSize * m_handlePaddingFactor;
-    QRectF resizeArea(m_rect.bottomRight() - QPointF(areaSize, areaSize), QSizeF(areaSize, areaSize));
-    // For debugging:
-    // qDebug() << "Resize area:" << resizeArea << "Pos:" << pos;
-    return resizeArea.contains(pos);
+    // Define a rectangle at the middle of the right side as connection port.
+    qreal portX = m_rect.right() - m_portWidth;
+    qreal portY = m_rect.center().y() - m_portHeight / 2;
+    QRectF portRect(portX, portY, m_portWidth, m_portHeight);
+    return portRect.contains(pos);
 }
 
 void NodeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isInResizeArea(event->pos()))
+    // Check if the click occurs in the resize handle area first.
+    // (We already had resizing logic; assume that's unchanged.)
+    QRectF resizeRect(m_rect.bottomRight() - QPointF(m_handleSize * m_handlePaddingFactor, m_handleSize * m_handlePaddingFactor),
+                      QSizeF(m_handleSize * m_handlePaddingFactor, m_handleSize * m_handlePaddingFactor));
+    if (resizeRect.contains(event->pos()))
     {
         m_isResizing = true;
         m_resizeStartPos = event->pos();
         m_originalRect = m_rect;
         setCursor(Qt::SizeFDiagCursor);
         event->accept();
+        return;
     }
-    else
-    {
-        QGraphicsItem::mousePressEvent(event);
-    }
+    // Otherwise, let the event pass on normally (for movement, etc.).
+    QGraphicsItem::mousePressEvent(event);
 }
 
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -120,9 +133,17 @@ void NodeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void NodeItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-    if (isInResizeArea(event->pos()))
+    QPointF pos = event->pos();
+    // Set cursor based on hover: over resize area => resize cursor; over connection port => connection cursor; else default.
+    QRectF resizeRect(m_rect.bottomRight() - QPointF(m_handleSize * m_handlePaddingFactor, m_handleSize * m_handlePaddingFactor),
+                      QSizeF(m_handleSize * m_handlePaddingFactor, m_handleSize * m_handlePaddingFactor));
+    if (resizeRect.contains(pos))
     {
         setCursor(Qt::SizeFDiagCursor);
+    }
+    else if (isInConnectionPort(pos))
+    {
+        setCursor(Qt::CrossCursor); // Change to a distinct cursor to indicate "start connection"
     }
     else
     {
